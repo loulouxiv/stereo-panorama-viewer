@@ -94,24 +94,23 @@ AFRAME.registerComponent("overunder", {
    */
   createImageSphere: function (material, side) {
     var geometry = new THREE.SphereGeometry(5000, 64, 64);
-    var uvs = geometry.faceVertexUvs[0];
+    var uvs = geometry.getAttribute('uv');
+    const uvsArray = uvs.array;
     var axis = "y";
+    var axisIndex = axis === "x" ? 0 : 1;
 
     // Display half
     if (side === "left") {
-      for (var i = 0; i < uvs.length; i++) {
-        for (var j = 0; j < 3; j++) {
-          uvs[i][j][axis] *= 0.5;
-          uvs[i][j][axis] += 0.5;
-        }
+      for (var i = 0; i < uvsArray.length; i += 2) {
+        uvsArray[i + axisIndex] *= 0.5;
+        uvsArray[i + axisIndex] += 0.5;
       }
     } else {
-      for (var i = 0; i < uvs.length; i++) {
-        for (var j = 0; j < 3; j++) {
-          uvs[i][j][axis] *= 0.5;
-        }
+      for (var i = 0; i < uvsArray.length; i += 2) {
+        uvsArray[i + axisIndex] *= 0.5;
       }
     }
+    uvs.needsUpdate = true;
 
     var sphere = new THREE.Mesh(geometry, material);
     sphere.name = side === "left" ? "leftSphere" : "rightSphere";
